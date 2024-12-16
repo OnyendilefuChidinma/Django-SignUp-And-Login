@@ -1,0 +1,11 @@
+{% for mesg in messages %}
+   <div class="alert 
+    {% if mesg.tags == 'error' %}alert-danger{% endif %}
+    {% if mesg.tags == 'success' %}alert-success{% endif %}
+    {% if mesg.tags == 'info' %}alert-info{% endif %}
+    {% if mesg.tags == 'warning' %}alert-warning{% endif %}
+    alert-dismissible fade show" role="alert">
+    {{ mesg }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}

@@ -1,0 +1,51 @@
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+.header {
+  background: linear-gradient(90deg, #6200ea 0%, #a151d9 100%);
+  color: white;
+  padding: 20px;
+}
+.header img {
+  border-radius: 50%;
+}
+.header .stats {
+  text-align: right;
+}
+.filter-section {
+  background-color: #f4f5fa;
+  padding: 20px;
+}
+.table {
+  border-collapse: collapse; /* Collapses borders to remove white space */
+}
+.table th,
+.table td {
+  vertical-align: middle;
+  border: 1px solid #dee2e6; /* Maintain border style but remove inner white space */
+}
+.btn-custom {
+  background-color: #6c63ff;
+  color: white;
+  border-radius: 20px;
+  padding: 10px 30px;
+}
+.btn-custom:hover {
+  background-color: #5a55d8;
+}
+.badge {
+  background-color: #e9f0fa;
+  color: #5a55d8;
+}
+.bg-info {
+  background-color: dodgerblue !important;
+}
+
+.table-header th {
+  padding: 20px 0;
+}
+
+/* .table-container::-webkit-scrollbar {
+  display: none;
+} */

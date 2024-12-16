@@ -1,0 +1,192 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}" />
+  </head>
+  <body>
+    <!-- Alert message -->
+    <div class="container mt-3">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert 
+                  {% if message.tags == 'error' %}
+              
+                      alert-danger
+
+            {% else %}
+              
+                      alert-{{ message.tags }}
+            {% endif %} 
+                  alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Profile Header -->
+    <section class="profile-header">
+      <div class="container text-center">
+        {% if student.student_profile.profile_image %}
+          <img src="{{ student.student_profile.profile_image.url }}" alt="Profile" width="80" height="80" class="rounded-circle object-fit-cover" />
+        {% else %}
+          <img src="{% static 'assets/img/avatar_male.jpg' %}" alt="Profile" width="80" height="80" class="rounded-circle object-fit-cover" />
+        {% endif %}
+
+        <h1>{{ student.first_name }} {{ student.last_name }}</h1>
+
+        {% if student.program_set.first %}
+          <p>{{ student.program_set.first.courses }} Student | {{ cohort_group.name }}</p>
+        {% endif %}
+
+        <span class="badge badge-custom">{{ student.student_profile.rating }} Rating</span>
+      </div>
+    </section>
+
+    <!-- Profile Content -->
+    <section class="profile-content">
+      <div class="container">
+        <div class="row ">
+          <!-- About the Student -->
+          <div class="col-md-10 col-lg-7 mx-auto">
+            <div class="card p-4">
+              <h5>About {{ student.first_name }}</h5>
+              <p>{{ student.first_name }} {{ student.last_name }} {{ student.student_profile.bio }}</p>
+              <p>
+                Date of Birth: {{ student.student_profile.date_of_birth }} <br />
+                Address: {{ student.student_profile.address }}<br />
+                Joined: {{ student.date_join }}
+              </p>
+              <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#sendMessageModal">Send Message</button>
+            </div>
+          </div>
+
+          <!-- Related Students -->
+          <div class="col-md-10 col-lg-5 mx-auto">
+            <div class="card p-4">
+              <h5>Related Students ({{ cohort_group.name }})</h5>
+              <ul class="list-unstyled">
+                {% for related_member in cohort_members %}
+                  <li class="d-flex align-items-center mb-3">
+                    {% if related_member.student_profile.profile_image %}
+                      <img src="{{ related_member.student_profile.profile_image.url }}" alt="Profile" width="80" height="80" class="rounded-circle object-fit-cover" />
+                    {% else %}
+                      <img src="{% static 'assets/img/avatar_male.jpg' %}" alt="Profile" width="80" height="80" class="rounded-circle object-fit-cover" />
+                    {% endif %}
+
+                    <div class="ms-3">
+                      <h6 class="mb-0">{{ related_member.first_name }} {{ related_member.last_name }}</h6>
+
+                      {% if related_member.program_set.first %}
+                        <small>{{ related_member.program_set.first.courses }}</small>
+                      {% else %}
+                        <small>No program assigned</small>
+                      {% endif %}
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects Section -->
+        <div class="row mt-4">
+          <div class="col-lg-7 col-sm-0"></div>
+
+          <!-- Follow Me Section -->
+          <div class="col-lg-5 col-md-10 mx-auto">
+            <div class="card p-4">
+              <h5>Follow Me</h5>
+              <div class="follow-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Send Message Modal -->
+    <div class="modal fade" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="sendMessageModalLabel">Send Message to {{ student.first_name }} {{ student.last_name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="sendMessageForm" action="{% url 'send_message' %}" method="POST">
+              {% csrf_token %}
+
+              <input type="hidden" name="student_id" value="{{ student.slug }}" />
+
+              <!-- Student Name (Readonly) -->
+              <div class="mb-3">
+                <label for="studentName" class="form-label">Student Name</label>
+                <input type="text" class="form-control" id="studentName" value="{{ student.first_name }} {{ student.last_name }}" readonly />
+              </div>
+
+              <!-- Student Email (Readonly) -->
+              {% comment %} <div class="mb-3">
+                <label for="studentEmail" class="form-label">Student Email</label>
+                <input type="email" class="form-control" id="studentEmail" value="{{ student.student_profile.student_email }}" name="student_email" readonly />
+              </div> {% endcomment %}
+
+              <div class="mb-3">
+                <label for="studentEmail" class="form-label">Student Email</label>
+                <input type="email" class="form-control" id="studentEmail" value="{{ student.student_profile.student_email }}" name="student_email" />
+              </div>
+
+              <!-- Sender's Email -->
+              <div class="mb-3">
+                <label for="senderEmail" class="form-label">Your Email</label>
+                <input type="email" class="form-control" id="senderEmail" name="sender_email" required />
+              </div>
+
+              <!-- Sender's Phone Number -->
+              <div class="mb-3">
+                <label for="senderPhone" class="form-label">Your Phone Number</label>
+                <input type="text" class="form-control" id="senderPhone" name="sender_phone" required />
+              </div>
+
+              <!-- Message Subject -->
+              <div class="mb-3">
+                <label for="messageSubject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="messageSubject" name="message_subject" required />
+              </div>
+
+              <!-- Message Body -->
+              <div class="mb-3">
+                <label for="messageBody" class="form-label">Message</label>
+                <textarea class="form-control" id="messageBody" name="message_body" rows="4" required></textarea>
+              </div>
+
+              <!-- Send Button -->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  </body>
+</html>
